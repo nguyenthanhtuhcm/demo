@@ -4,6 +4,7 @@ import com.example.demo.dto.request.AuthenticationRequest;
 import com.example.demo.dto.request.IntrospectRequest;
 import com.example.demo.dto.response.AuthenticationResponse;
 import com.example.demo.dto.response.IntrospectResponse;
+import com.example.demo.entity.User;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
 import com.example.demo.repository.UserRepository;
@@ -22,10 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @Slf4j
@@ -67,7 +70,7 @@ public class AuthenticationService {
         if (!auth) {
             throw new AppException(ErrorCode.UNAUTHENTICATE);
         }
-        String token = generateToken(user.getUsername());
+        String token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
@@ -75,13 +78,13 @@ public class AuthenticationService {
 
     }
 //
-    private String generateToken(String username) {
+    private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issuer("http://localhost:8080")
                 .issueTime(new Date())
-                .claim("userId", "Custom")
+                .claim("scope", scopeBuilder(user))
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
@@ -98,4 +101,13 @@ public class AuthenticationService {
 
     }
 
+    private String scopeBuilder(User user) {
+        StringJoiner scope = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            for (String role : user.getRoles()) {
+                scope.add(role);
+            }
+        }
+        return scope.toString().trim();
+    }
 }
