@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.request.UserCreationRequest;
 import com.example.demo.dto.request.UserUpdateRequest;
+import com.example.demo.dto.response.UserResonse;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,40 +18,41 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ApiResponse<User> createUser(@RequestBody UserCreationRequest request)
+    public ApiResponse<UserResonse> createUser(@RequestBody UserCreationRequest request)
     {
-        ApiResponse<User> response = new ApiResponse<>();
-        response.setResult(userService.CreateUser(request));
-        return response;
+        return ApiResponse.<UserResonse>builder()
+                .result(userService.CreateUser(request))
+                .build();
     }
 
     @GetMapping
-    public ApiResponse<List<User>>  getAllUsers()
+    public ApiResponse<List<UserResonse>>  getAllUsers()
     {
-        ApiResponse<List<User>> response = new ApiResponse<>();
-        response.setResult(userService.getAllUsers());
-        return response;
+        return ApiResponse.<List<UserResonse>>builder()
+                .result(userService.getAllUsers())
+                .build();
     }
     @GetMapping("/{id}")
-    public ApiResponse<User> getUserById(@PathVariable String id)
+    public ApiResponse<UserResonse> getUserById(@PathVariable String id)
     {
-        ApiResponse<User> response = new ApiResponse<>();
-        response.setResult(userService.getUserById(id));
-        return response;
+        return ApiResponse.<UserResonse>builder()
+                .result(userService.getUserById(id))
+                .build();
     }
     @PutMapping("/{id}")
-    public ApiResponse<User> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request)
+    public ApiResponse<UserResonse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request)
     {
-        ApiResponse<User> response = new ApiResponse<>();
-        response.setResult(userService.updateUser(id, request));
-        return response;
+        return ApiResponse.<UserResonse>builder()
+                .result(userService.updateUser(id, request))
+                .build();
     }
     @DeleteMapping("/{id}")
-    public ApiResponse deleteUser(@PathVariable String id)
+    public ApiResponse<String> deleteUser(@PathVariable String id)
     {
-        ApiResponse<User> response = new ApiResponse<>();
         userService.deleteUser(id);
-        return  response;
+        return  ApiResponse.<String>builder()
+            .result("User deleted successfully")
+            .build();
 
     }
 }
