@@ -8,7 +8,9 @@ public enum ErrorCode {
     INVALID_PASSWORD(1004, "Password must be at least 8 characters"),
     USER_NOT_EXISTED(1005, "User not existed"),
     UNAUTHENTICATE(1006, "Unauthenticated"),
-    ACCESS_DENIED(1007, "Access denied")
+    ACCESS_DENIED(1007, "Access denied"),
+    PERMISSION_NOT_EXISTED(1008, "Permission not existed"),
+    ROLE_NOT_EXISTED(1009, "Role not existed"),
     ;
 
     private int code;
