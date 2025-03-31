@@ -1,5 +1,6 @@
 package com.example.demo.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +31,13 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {"/users",
-            "/auth/login", "/auth/introspect"
+            "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refreshToken"
     };
     @Value("${jwt.signerKey}")
     private String signingKey;
+
+    @Autowired
+    private JwtCustomDecoder jwtCustomDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -43,7 +47,7 @@ public class SecurityConfig {
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwt -> jwt
-                        .decoder(jwtDecoder())
+                        .decoder(jwtCustomDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())));
         // Disable CSRF protection for simplicity
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
